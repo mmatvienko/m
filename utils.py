@@ -1,14 +1,47 @@
-from time import time
+from time import time, sleep
+
+class Strategy():
+    def __init__(self):
+        self.HZ = 5.0
+        self.price_sum = 0
+        self.price_sum_sq = 0
+        self.count = 0
+
+    # calculate average using a queue, be able to set size using some parameter
+    def execute(self, portfolio):
+        goog = Security("GOOG")
+        while True:
+            price = goog.get_price()
+
+            # do things necessary for avg and stddev calc
+            self.price_sum += price
+            self.price_sum_sq += price**2
+            self.count += 1.0
+
+            # if goog.get_price() < 6:
+            #     portfolio.buy(goog, 3)
+            # if goog.get_price() > 27:
+            #     portfolio.sell_all(goog)
+            avg = self.price_sum / self.count
+            var = (self.price_sum_sq - ((self.price_sum)**2)/self.count) / self.count
+            print(f'Price: {price:.2f}\tAvg: {avg:.2f}\tvar: {var:.2f}')
+            sleep(1.0/self.HZ)
+
 
 class Security:
     def __init__(self, ticker):
         self.ticker = ticker
         self.price = None
-
+        self.prices = None
+        with open("data/goog_stock.csv", "r") as f:
+            self.prices = [float(x.split(',')[3]) for x in f.readlines()[1:]]
+        self.counter = 0
 
     def get_price(self):
         # do price grabbing stuff like talking to an API
-        self.price = time() % 32
+        # self.price = time() % 32
+        self.price = self.prices[self.counter]
+        self.counter += 1
         return self.price # maybe append timestamp
 
 
