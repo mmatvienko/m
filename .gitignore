@@ -3,3 +3,5 @@ venv/*
 
 accounts.py
 *~
+
+**/.DS_STORE
