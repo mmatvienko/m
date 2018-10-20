@@ -1,6 +1,7 @@
 # This file should hopefully run everything... probably good if I design everything first
 from accounts import AlphaVantage
-from utils import Security, Portfolio, Strategy
+from strategy import Strategy
+from portfolio import Portfolio
 
 apikey = AlphaVantage.apiKey
 
