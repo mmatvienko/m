@@ -30,10 +30,10 @@ class AutoQueue():              # For fun implement this in C++ and call from py
         return sum([x**2 for x in self.contents])
 
     def average(self):
-        return self.sum()/self.length()
+        return self.sum()/self.__len__()
 
     def variance(self):
-        return (self.sum_sq() - (self.sum()**2)/self.length()) / self.length()
+        return (self.sum_sq() - (self.sum()**2)/self.__len__()) / self.__len__()
     
     def __str__(self):
         return str(self.contents)
