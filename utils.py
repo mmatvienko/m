@@ -1,84 +1,49 @@
 from time import time, sleep
+from queue import Queue
+DEBUG = False
 
-class Strategy():
-    def __init__(self):
-        self.HZ = 5.0
-        self.price_sum = 0
-        self.price_sum_sq = 0
-        self.count = 0
-
-    # calculate average using a queue, be able to set size using some parameter
-    def execute(self, portfolio):
-        goog = Security("GOOG")
-        while True:
-            price = goog.get_price()
-
-            # do things necessary for avg and stddev calc
-            self.price_sum += price
-            self.price_sum_sq += price**2
-            self.count += 1.0
-
-            # if goog.get_price() < 6:
-            #     portfolio.buy(goog, 3)
-            # if goog.get_price() > 27:
-            #     portfolio.sell_all(goog)
-            avg = self.price_sum / self.count
-            var = (self.price_sum_sq - ((self.price_sum)**2)/self.count) / self.count
-            print(f'Price: {price:.2f}\tAvg: {avg:.2f}\tvar: {var:.2f}')
-            sleep(1.0/self.HZ)
-
-
-class Security:
-    def __init__(self, ticker):
-        self.ticker = ticker
-        self.price = None
-        self.prices = None
-        with open("data/goog_stock.csv", "r") as f:
-            self.prices = [float(x.split(',')[3]) for x in f.readlines()[1:]]
-        self.counter = 0
-
-    def get_price(self):
-        # do price grabbing stuff like talking to an API
-        # self.price = time() % 32
-        self.price = self.prices[self.counter]
-        self.counter += 1
-        return self.price # maybe append timestamp
-
-
-class Portfolio:
-    def __init__(self, balance):
-        self.balance = balance
-        self.holdings = {}
-
-    def buy(self, security, quantity):
-        if not self.can_purchase(security, quantity):
-            return False
-        # check if you can actully purchase
-        purchase_price = security.get_price()
-        self.balance -= purchase_price * quantity
-        if security in self.holdings:
-            self.holdings[security] += quantity
-        else:
-            self.holdings[security] = quantity
-        print(f'purchased {quantity} shares of {security.ticker} at {purchase_price}')
-        print(f'balance is now {self.balance}')
-        # maybe track the purchase in a serializable python class
-        return True
-
-
-    def sell_all(self, security):
-        if security in self.holdings:
-            sale_price = security.get_price()
-            quantity = self.holdings[security]
-            self.balance += sale_price * quantity
-            del self.holdings[security]
-            print(f'sold {quantity}x{security.ticker} for {sale_price*quantity}')
-            print(f'balance is now {self.balance}')
-
-            return True
-        return False
+class AutoQueue():              # For fun implement this in C++ and call from python?
+    """A queue that can automatically throws out elements if full.
+    Can also print contents of the queue
+    """
     
+    def __init__(self, max_size=5):
+        self.contents = []
+        self.MAX_SIZE = max_size
+        self.filled = False     # not really true if max_size=0
 
-    def can_purchase(self, security, quantity):
-        # define this based on whatever metric
-        return self.balance > security.get_price() * quantity
+    def put(self, item):
+        # TODO method is super ugly, fix
+        # check on fill
+        if not self.filled:
+            self.contents.append(item)
+            if self.MAX_SIZE == len(self.contents):
+                self.filled = True
+        else:
+            del self.contents[0]
+            self.contents.append(item)
+
+    def sum(self):
+        return sum(self.contents)
+
+    def sum_sq(self):
+        return sum([x**2 for x in self.contents])
+
+    def average(self):
+        return self.sum()/self.length()
+
+    def variance(self):
+        return (self.sum_sq() - (self.sum()**2)/self.length()) / self.length()
+    
+    def __str__(self):
+        return str(self.contents)
+
+    def __len__(self):
+        # TODO can just store length and save even more compute time
+        if self.filled:
+            if DEBUG:
+                print('quick length')
+            return self.MAX_SIZE
+        if DEBUG:
+            print('calculated length')
+        return len(self.contents)
