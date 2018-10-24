@@ -1,4 +1,5 @@
-DEBUG = True
+import time
+DEBUG = False
 class Portfolio:
     def __init__(self, balance):
         self.balance = balance

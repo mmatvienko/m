@@ -2,16 +2,20 @@ from time import sleep
 from utils import AutoQueue
 from security import Security
 
+class BlankStrat():
+    def __init__(self):
+        pass
+
 class Strategy():
     def __init__(self):
         # TODO framework to test different parameter in parallel
-        self.HZ = 5.0
+        self.HZ = 140.0
         self.price_sum = 0
         # perhaps make arg in Q(arg) an arg in __init__
         self.prices = AutoQueue(10)
         self.price_sum_sq = 0
         self.count = 0
-        self.boundary = 0.05    # percent change from mean
+        self.boundary = 0.025    # percent change from mean
 
     # calculate average using a queue, be able to set size using some parameter
     def execute(self, portfolio):
@@ -37,8 +41,7 @@ class Strategy():
                 # high price, want to sell_all
                 portfolio.sell_all(goog)
                 self.holding = False
-            print(f'Price: {price:.2f}\tAvg: {avg:.2f}\tvar: {var:.2f}')
-            print(f'while counter: {counter}')
+            # print(f'Price: {price:.2f}\tAvg: {avg:.2f}\tvar: {var:.2f}')
             counter += 1
-            # sleep(1.0/self.HZ)
+            sleep(1.0/self.HZ)
         print(portfolio)
