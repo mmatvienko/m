@@ -4,18 +4,18 @@ from queue import Queue
 from threading import Thread
 
 import strategy, time, sys
-
-"""
-hopefully can read all strategies in a module print them out for user to choose.
-UPDATE: nice, it works. use this to display strategies.
-most likely portoflios will be serialized and encrypted (if possible) 
-and perhaps along with account
-"""
-
 import inspect
-print([m[0] for m in inspect.getmembers(strategy, inspect.isclass) if m[1].__module__ == 'strategy'])
 
-sys.exit()
+print("Strategies\n")
+
+strategies = [m for m in inspect.getmembers(strategy, inspect.isclass) if m[1].__module__ == 'strategy']
+for i, strategy in enumerate(strategies):
+    print(f'[{i + 1}] {strategy[0]}')
+
+print('\nSelection: ', end='' )
+strat_num = int(input()) - 1
+strat = strategies[strat_num][1]()
+
 
 def worker():
     """Simple worker daemon to execute trading jobs"""
@@ -26,28 +26,19 @@ def worker():
 
 jobs = Queue()
 
-for i in range(3):
+for i in range(1):
     t = Thread(target=worker)
     t.daemon = True
     t.start()
-
-
 
 # THIS IS NOT THREAD SAFE AT ALL
 """
 Using multiple strats 'looks better' than using a single one. 
 Makes sense since Strategy stores state. Strategy should really just dictate how everything runs
 """
-strat = strategy.Strategy()
-strat1 = strategy.Strategy()
-strat2 = strategy.Strategy()
-port1 = Portfolio(1000)
-port2 = Portfolio(2000)
-port3 = Portfolio(3000)
-jobs.put((strat, port1))
-jobs.put((strat1, port2))
-jobs.put((strat2, port3))
 
+port = Portfolio(10000)
+jobs.put((strat, port))
 jobs.join()
 
 
