@@ -2,7 +2,8 @@
 ## Right now just messing around and having fun :)
 Good links:
 * https://www.indiehackers.com/interview/building-a-3-500-mo-neural-net-for-trading-as-a-side-project-5dda352c13
-** https://developers.kite.trade/login
+  * https://developers.kite.trade/login
+* https://app.alpaca.markets/login
 
 Information on FiX API:
 * https://en.wikipedia.org/wiki/Financial_Information_eXchange
